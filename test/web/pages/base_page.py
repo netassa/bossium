@@ -6,6 +6,7 @@
 """
 import os
 import sys
+import time
 
 from poium import Page
 from selenium import webdriver
@@ -26,28 +27,36 @@ class WebDriverSingleton:
             driver_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                        '..', 'drivers', 'chromedriver.exe'))
             service = webdriver.ChromeService(executable_path=driver_path)
-            WebDriverSingleton._driver = webdriver.Chrome(service=service)
+            options = webdriver.ChromeOptions()
+            options.add_argument('--start-maximized')
+            WebDriverSingleton._driver = webdriver.Chrome(service=service, options=options)
         return WebDriverSingleton._driver
 
 
 class BasePage(Page):
-    def __init__(self, base_url=None):
-        self.driver = WebDriverSingleton.get_driver_instance()
-        self.config_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+    driver = None
+    if driver is None:
+        driver_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                       '..', 'drivers', 'chromedriver.exe'))
+        service = webdriver.ChromeService(executable_path=driver_path)
+        options = webdriver.ChromeOptions()
+        options.add_argument('--start-maximized')
+        driver = webdriver.Chrome(service=service, options=options)
+    _config_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                         '..', '..', '..', 'config', 'web_config.json'))
-        if base_url is None:
-            self.base_url = Utils.read_config(self.config_path)['base_url']
-        else:
-            self.base_url = base_url
+    _base_url = Utils.read_config(_config_path)['base_url']
+    _opened_home = True
 
+    def __init__(self):
+        super().__init__(self.driver)
         self.wait = WebDriverWait(self.driver, 10)
-        self.open_home()
+        if BasePage._opened_home:
+            self._open_home()
+            BasePage._opened_home = False
 
-    def open_home(self):
-        self.maximize_window()
-        self.get(self.base_url)
-        self.wait.until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "a[href='https://www.zhipin.com/'][title='BOSS直聘']")))
+    def _open_home(self):
+        self.get(self._base_url)
+        self.wait_for_element_to_be_visible(By.CSS_SELECTOR, "a[href='https://www.zhipin.com/'][title='BOSS直聘']")
 
     def quit(self):
         self.driver.quit()
@@ -113,3 +122,21 @@ class BasePage(Page):
 
     def toast_text(self, selector):
         return self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, selector))).text
+
+    def get_element(self, locator_type, locator):
+        time.sleep(0.5)
+        return self.wait.until(EC.visibility_of_element_located((locator_type, locator)))
+
+    def get_elements(self, locator_type, locator):
+        time.sleep(0.5)
+        return self.wait.until(EC.visibility_of_all_elements_located((locator_type, locator)))
+
+    def wait_for_element_to_be_visible(self, locator_type, locator):
+        self.wait.until(EC.visibility_of_element_located((locator_type, locator)))
+
+    def wait_for_element_to_be_invisible(self, locator_type, locator):
+        self.wait.until(EC.invisibility_of_element((locator_type, locator)))
+
+    def wait_for_page_is_loaded(self):
+        self.wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
+

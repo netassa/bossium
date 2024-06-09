@@ -4,15 +4,14 @@
 @file: home_page.py
 @time: 2024/5/28 19:49
 """
-from poium import Element
 
 from test.web.pages.base_page import BasePage
-from . import login_page
+from test.web.pages.common_component_page import HeaderPage, FooterPage
 
 
 class HomePage(BasePage):
-    login_button = Element('.header-login-btn')
+    def get_header_component(self):
+        return HeaderPage()
 
-    def __init__(self, base: BasePage = None):
-        self.driver = base.driver
-        # login_page.login()   # 如果可登录的话，每一个页面都要先登录
+    def get_footer_component(self):
+        return FooterPage()
