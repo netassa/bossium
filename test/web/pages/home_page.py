@@ -10,6 +10,8 @@ from test.web.pages.common_component_page import HeaderPage, FooterPage
 
 
 class HomePage(BasePage):
+    _base_url = 'https://www.zhipin.com/'
+
     def get_header_component(self):
         return HeaderPage()
 

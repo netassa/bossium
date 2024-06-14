@@ -12,6 +12,7 @@ from utils.utils import Utils
 
 
 class LoginPage(BasePage):
+    _base_url = 'https://www.zhipin.com/web/user/?ka=header-login'
 
     # 左边图标区
     header_logo = Element('a[ka="header-logo"]')
@@ -20,7 +21,7 @@ class LoginPage(BasePage):
 
     communicate_icon = Element('.icon-chat')
     communicate_title = Element(".icon-chat+em")
-    communicat_description = Element(".icon-chat~span")
+    communicate_description = Element(".icon-chat~span")
 
     select_icon = Element('.icon-select')
     select_title = Element(".icon-select+em")

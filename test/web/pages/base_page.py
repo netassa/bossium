@@ -140,3 +140,7 @@ class BasePage(Page):
     def wait_for_page_is_loaded(self):
         self.wait.until(lambda d: d.execute_script("return document.readyState") == "complete")
 
+    def go_to_my_page(self):
+        self.driver.get(self._base_url)
+        time.sleep(0.5)
+
