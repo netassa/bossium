@@ -144,3 +144,9 @@ class BasePage(Page):
         self.driver.get(self._base_url)
         time.sleep(0.5)
 
+    def get_screenshot_as_base64(self):
+        return self.driver.get_screenshot_as_base64()
+
+    def get_screenshot_as_png(self):
+        self.driver.get_screenshot_as_png()
+

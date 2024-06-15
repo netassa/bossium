@@ -7,7 +7,7 @@
 
 from pytest import assume
 
-from test.web.cases import home_page, login_page
+from test.web import home_page, login_page
 
 
 class TestLoginPage:
@@ -21,12 +21,14 @@ class TestLoginPage:
 
     def test_login(self):
         """测试登录"""
+        home_page.go_to_my_page()
         home_page.get_header_component().login_or_sign_in()  # 主页点击登录/注册按钮
         login_page.login()  # 登录
         assert login_page.toast.text == "请先完成验证"
 
     def test_ui(self):
         """测试登录界面的UI元素"""
+        login_page.go_to_my_page()
         with assume:
             assert login_page.iboss_call.text == '客户服务热线: 400 065 5799'
         with assume:
@@ -50,5 +52,6 @@ class TestLoginPage:
 
     def test_navigate_to_home(self):
         """测试导航到主页"""
+        login_page.go_to_my_page()
         temp_home_page = login_page.navigate_to_home()  # 点击找工作图标
         assert temp_home_page.title == 'BOSS直聘-找工作上BOSS直聘直接谈！招聘求职找工作！'
